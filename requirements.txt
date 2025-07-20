@@ -1,7 +1,10 @@
 flask
 flask_sqlalchemy
-flask_login
 openai
 requests
 apscheduler
 supabase
+flask_login
+werkzeug
+google-auth-oauthlib
+google-api-python-client
