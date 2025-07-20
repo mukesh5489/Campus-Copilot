@@ -1,0 +1,87 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Admin Events Dashboard</h2>
+  <div class="mb-3">
+    <form method="post">
+      <button type="submit" name="export_events" class="btn btn-outline-primary">Export Events CSV</button>
+    </form>
+  </div>
+  <div class="row mb-3">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Analytics</h5>
+          <p>Total Events: {{ total_events }}</p>
+          <p>Approved Events: {{ approved_events }}</p>
+          <p>Pending Events: {{ pending_events }}</p>
+          <ul>
+            {% for cat, count in category_counts.items() %}
+              <li>{{ cat }}: {{ count }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <form method="post">
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAllEvents" onclick="toggleAll('bulk_event_ids', this)"></th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Approved</th>
+          <th>User Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+        <tr>
+          <td><input type="checkbox" name="bulk_event_ids" value="{{ event['id'] }}"></td>
+          <td>{{ event['title'] }}</td>
+          <td>{{ event['category'] }}</td>
+          <td>{{ event['event_date'] }}</td>
+          <td>{{ event['event_time'] }}</td>
+          <td>{{ 'Yes' if event.get('approved') else 'No' }}</td>
+          <td>{{ event.get('user_email', '') }}</td>
+          <td>
+            <button type="submit" name="edit_event_id" value="{{ event['id'] }}" class="btn btn-sm btn-warning">Edit</button>
+            <button type="submit" name="delete_event_id" value="{{ event['id'] }}" class="btn btn-sm btn-danger">Delete</button>
+            {% if not event.get('approved') %}
+              <button type="submit" name="approve_event_id" value="{{ event['id'] }}" class="btn btn-sm btn-success">Approve</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" name="bulk_delete" class="btn btn-danger">Bulk Delete</button>
+    <button type="submit" name="bulk_approve" class="btn btn-success">Bulk Approve</button>
+  </form>
+  <hr>
+  <h4>Add Event</h4>
+  <form method="post">
+    <input type="hidden" name="add_event" value="1">
+    <div class="row">
+      <div class="col"><input type="text" name="title" class="form-control" placeholder="Title" required></div>
+      <div class="col"><input type="text" name="category" class="form-control" placeholder="Category" required></div>
+      <div class="col"><input type="date" name="date" class="form-control" required></div>
+      <div class="col"><input type="time" name="time" class="form-control" required></div>
+      <div class="col"><input type="email" name="email" class="form-control" placeholder="User Email" required></div>
+      <div class="col"><button type="submit" class="btn btn-primary">Add Event</button></div>
+    </div>
+  </form>
+</div>
+<script>
+function toggleAll(name, source) {
+  checkboxes = document.getElementsByName(name);
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+{% endblock %}
