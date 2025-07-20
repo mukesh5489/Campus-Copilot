@@ -1,0 +1,102 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Admin Users Dashboard</h2>
+  <div class="mb-3">
+    <form method="post">
+      <button type="submit" name="export_users" class="btn btn-outline-primary">Export Users CSV</button>
+    </form>
+  </div>
+  <form method="post">
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAllUsers" onclick="toggleAll('bulk_user_ids', this)"></th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Active</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td><input type="checkbox" name="bulk_user_ids" value="{{ user.id }}"></td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ 'Yes' if user.is_active else 'No' }}</td>
+          <td>
+            <button type="submit" name="edit_user_id" value="{{ user.id }}" class="btn btn-sm btn-warning">Edit</button>
+            <button type="submit" name="delete_user_id" value="{{ user.id }}" class="btn btn-sm btn-danger">Delete</button>
+            <button type="submit" name="reset_password_id" value="{{ user.id }}" class="btn btn-sm btn-secondary">Reset Password</button>
+            {% if user.is_active %}
+              <button type="submit" name="deactivate_user_id" value="{{ user.id }}" class="btn btn-sm btn-outline-danger">Deactivate</button>
+            {% else %}
+              <button type="submit" name="activate_user_id" value="{{ user.id }}" class="btn btn-sm btn-outline-success">Activate</button>
+            {% endif %}
+            <select name="new_role" onchange="this.form.change_role_id.value='{{ user.id }}'; this.form.submit();" class="form-select form-select-sm d-inline w-auto">
+              <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
+              <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+            <input type="hidden" name="change_role_id" value="">
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" name="bulk_delete" class="btn btn-danger">Bulk Delete</button>
+    <button type="submit" name="bulk_activate" class="btn btn-success">Bulk Activate</button>
+    <button type="submit" name="bulk_deactivate" class="btn btn-warning">Bulk Deactivate</button>
+  </form>
+  <hr>
+  <h4>Add User</h4>
+  <form method="post">
+    <input type="hidden" name="add_user" value="1">
+    <div class="row">
+      <div class="col"><input type="text" name="username" class="form-control" placeholder="Username" required></div>
+      <div class="col"><input type="email" name="email" class="form-control" placeholder="Email" required></div>
+      <div class="col"><input type="password" name="password" class="form-control" placeholder="Password" required></div>
+      <div class="col">
+        <select name="role" class="form-select">
+          <option value="student">Student</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="col">
+        <input type="checkbox" name="is_active" checked> Active
+      </div>
+      <div class="col"><button type="submit" class="btn btn-primary">Add User</button></div>
+    </div>
+  </form>
+  <hr>
+  <h4>User Activity Log</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Action</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in activity_log %}
+      <tr>
+        <td>{{ log.user_id }}</td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.timestamp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+function toggleAll(name, source) {
+  checkboxes = document.getElementsByName(name);
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+{% endblock %}
