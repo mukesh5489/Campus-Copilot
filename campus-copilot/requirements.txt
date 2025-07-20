@@ -1,6 +1,0 @@
-flask
-flask_sqlalchemy
-openai
-requests
-apscheduler
-supabase
